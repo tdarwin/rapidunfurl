@@ -4,7 +4,7 @@ import requests
 from uritools import urisplit
 
 
-def hackernews(url, timeout=15, html=None):
+def hackernews(url, timeout=15):
     """Returns the comment text and story title.  Domain is prefixed with the submitter/commenter name"""
 
     id = urisplit(url).getquerydict().get("id")[0]

@@ -22,14 +22,14 @@ with io.open(os.path.join(CURDIR, "README.md"), "r", encoding="utf-8") as f:
 
 
 setup(
-    name="pyunfurl",
-    version='0.1.5',
-    author="Loftie Ellis",
+    name="rapidunfurl",
+    version='0.0.1',
+    author="Davin Taddeo",
     author_email="pyunfurl@unfurl.dev",
-    description="library for embedding ('unfurling') content from other sites into your own site",
+    description="library designed to pull and process metadata very quickly to unfurl URL contents into a JSON object that can the be used by other programs",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/lpellis/pyunfurl",
+    url="https://github.com/tdarwin/rapidunfurl",
     packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
     include_package_data=True,
     install_requires=DEPENDENCIES,

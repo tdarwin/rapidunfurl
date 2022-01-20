@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import pyunfurl
+import rapidunfurl
 
 
 class UnitTests(unittest.TestCase):

@@ -4,11 +4,11 @@ import re
 
 from micawber import Provider, ProviderRegistry, ProviderException
 
-from pyunfurl.provider_data.noembed import NOEMBED_PROVIDER_LIST
+from .provider_data.noembed import NOEMBED_PROVIDER_LIST
 from .provider_data.custom import CUSTOM_PROVIDER_LIST
 from .provider_data.oembed import OEMBED_PROVIDER_LIST
 
-__version__ = "0.0.0.1"
+__version__ = "0.0.1"
 import micawber
 import requests
 from pyquery import PyQuery as pq
@@ -18,17 +18,21 @@ from uritools import urijoin, urisplit
 def get(url, timeout=15):
     return requests.get(url, timeout=timeout, headers={'User-Agent': 'Twitterbot/1.0'})
 
-def template(className, url, image, title, description, domain):
-    return f"""<div class="unfurl {className}">
-    <a rel="noopener nofollow" target="_blank" href="{url}">
-        <img src="{image}">
-    </a>
-    <div class="unfurl-content">
-        <a rel="noopener nofollow" target="_blank" class="unfurl-title" href="{url}">{title}</a>
-        <div>{description}</div>
-        <a rel="noopener nofollow" target="_blank" class="unfurl-domain" href="{url}">{domain}</a>
-    </div>
-</div>"""
+
+def get_favicon(html, url, timeout=5):
+
+    d = pq(html)
+
+    favicon = d('link[rel="alternate icon"]').attr("href")
+    favicon = d('link[rel="shortcut icon"]').attr("href")
+    favicon = d('link[rel="icon"]').attr("href")
+    if not favicon:
+        favicon_url = urijoin(url, "/favicon.ico")
+        r = requests.head(favicon_url)
+        if r.status_code == 200:
+            favicon = favicon_url
+
+    return favicon
 
 
 def wrap_response(url, data, method):
@@ -38,7 +42,6 @@ def wrap_response(url, data, method):
     favicon = ("favicon" in data and data["favicon"]) or ""
     description = ("description" in data and data["description"]) or ""
     url = ("url" in data and data["url"]) or url
-    css = ("css" in data and data["css"]) or ""
 
     if image:
         image = urijoin(url, image)
@@ -55,25 +58,6 @@ def wrap_response(url, data, method):
     if "provider_name" in data and data["provider_name"]:
         site = data["provider_name"]
 
-    if method == "oembed" or (method == "custom" and "html" in data and data["html"]):
-        html = data["html"]
-    else:
-        if image:
-            html = template("unfurl-image", url, image, title, description, domain)
-        elif favicon:
-            html = template(
-                "unfurl-image unfurl-favicon", url, favicon, title, description, domain
-            )
-        else:
-            html = template(
-                "unfurl-image unfurl-default",
-                url,
-                "https://i.imgur.com/wQ37ilJ.png",
-                title,
-                description,
-                domain,
-            )
-
     return {
         "method": method,
         "site": site,
@@ -83,9 +67,6 @@ def wrap_response(url, data, method):
         "image": image,
         "favicon": favicon,
         "url": url,
-        "type": "rich",
-        "html": html,
-        "css": css,
     }
 
 
@@ -123,10 +104,7 @@ def load_providers(provider_list="OEMBED", remote=False):
     return provider
 
 
-def open_graph(url, timeout=15, html=None):
-
-    if not html:
-        html = get(url, timeout=timeout).text
+def open_graph(html):
 
     d = pq(html)
     return {
@@ -142,10 +120,7 @@ def open_graph(url, timeout=15, html=None):
     }
 
 
-def twitter_card(url, timeout=15, html=None):
-
-    if not html:
-        html = get(url, timeout=timeout).text
+def twitter_card(html):
 
     d = pq(html)
     return {
@@ -158,18 +133,9 @@ def twitter_card(url, timeout=15, html=None):
         "title": d('meta[name="twitter:title"]').attr("content"),
     }
 
-
-def meta_tags(url, timeout=15, html=None):
-    if not html:
-        html = get(url, timeout=timeout).text
+def meta_tags(html, favicon):
 
     d = pq(html)
-    favicon = d('link[rel="shortcut icon"]').attr("href")
-    if not favicon:
-        favicon_url = urijoin(url, "/favicon.ico")
-        r = requests.head(favicon_url)
-        if r.status_code == 200:
-            favicon = favicon_url
 
     return {
         "title": d('meta[name="title"]').attr("content") or d("title").text(),
@@ -182,7 +148,7 @@ def meta_tags(url, timeout=15, html=None):
     }
 
 
-def oembed(url, timeout=15, html=None, refresh_oembed_provider_list=False):
+def oembed(html, url, refresh_oembed_provider_list=False):
     try:
         embed = load_providers("OEMBED", refresh_oembed_provider_list).request(url)
         if embed and "html" in embed:
@@ -198,9 +164,6 @@ def oembed(url, timeout=15, html=None, refresh_oembed_provider_list=False):
         pass
 
     try:
-        if not html:
-            html = get(url, timeout=timeout).text
-
         d = pq(html)
         oembed_url = d('link[type="application/json+oembed"]').attr("href")
         if oembed_url:
@@ -221,10 +184,10 @@ def completed(data):
     return data["title"] and data["description"] and data["image"] and data["url"]
 
 
-def custom_unfurl(url, timeout=15, html=None):
+def custom_unfurl(url, timeout=15):
     for regex, provider in CUSTOM_PROVIDER_LIST:
         if re.match(regex, url):
-            return provider(url, timeout, html)
+            return provider(url, timeout)
 
     return None
 
@@ -239,21 +202,26 @@ def unfurl(url, timeout=15, html=None, refresh_oembed_provider_list=False):
     :return: dict
     """
 
-    data = custom_unfurl(url, timeout, html)
+    if not html:
+        html = get(url, timeout=timeout).text
+
+    favicon = get_favicon(html, url)
+
+    data = custom_unfurl(url, timeout)
     if data:
         return wrap_response(url, data, "custom")
 
-    data = oembed(url, timeout, html, refresh_oembed_provider_list)
+    data = oembed(html, url, refresh_oembed_provider_list)
     if data:
         return wrap_response(url, data, "oembed")
 
-    data = twitter_card(url, timeout, html)
+    data = twitter_card(html)
     if completed(data):
         return wrap_response(url, data, "twitter_card")
 
-    data = extend_dict(data, open_graph(url, timeout, html))
+    data = extend_dict(data, open_graph(html))
     if completed(data):
         return wrap_response(url, data, "open_graph")
 
-    data = extend_dict(data, meta_tags(url, timeout, html))
+    data = extend_dict(data, meta_tags(html, favicon))
     return wrap_response(url, data, "meta_tags")
