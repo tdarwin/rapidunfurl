@@ -24,22 +24,21 @@ pip install rapidunfurl
 
 ```python
 import rapidunfurl
-rapidunfurl.unfurl('https://www.youtube.com/watch?v=aBr2kKAHN6M') 
+rapidunfurl.unfurl('https://davintaddeo.com') 
 ```
 
 This will return a dict similar to the oembed spec:
 
 ```json
 {
-  'method': 'oembed', # one of 'oembed', 'twitter_card', 'open_graph', 'meta_tags', 'custom'
-  'site': 'YouTube', 
-  'domain': 'youtube.com', 
-  'title': 'Live Views of Starman', 
-  'description': '', 
-  'image': '', 
-  'favicon': '',  # only included if no image was found 
-  'url': 'https://www.youtube.com/watch?v=aBr2kKAHN6M', 
-  'type': 'rich'
+  "type": "website",
+  "url": "https://davintaddeo.com",
+  "title": "Davin Taddeo | DevOps Advocate",
+  "site_name": "@tdarwin",
+  "description": "Homepage of Davin Taddeo, DevOps Advocate, Senior Customer Architect for Chef",
+  "image": "https://davintaddeo.com/assets/images/round_headshot.png",
+  "card": "summary",
+  "favicon": "https://davintaddeo.com/favicon.ico"
 }
 ```
 

@@ -19,3 +19,5 @@ var/
 .mypy_cache/
 .vscode
 .idea
+__pycache__/
+__pycache__

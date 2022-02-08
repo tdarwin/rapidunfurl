@@ -23,9 +23,9 @@ with io.open(os.path.join(CURDIR, "README.md"), "r", encoding="utf-8") as f:
 
 setup(
     name="rapidunfurl",
-    version='0.0.1',
+    version='0.1.0',
     author="Davin Taddeo",
-    author_email="pyunfurl@unfurl.dev",
+    author_email="davin@davintaddeo.com",
     description="library designed to pull and process metadata very quickly to unfurl URL contents into a JSON object that can the be used by other programs",
     long_description=README,
     long_description_content_type="text/markdown",
