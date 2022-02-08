@@ -1,6 +1,7 @@
 NOEMBED_PROVIDER_LIST = [
     [
-        "https?://(?:[^\\.]+\\.)?(?:youtu\\.be|youtube\\.com/embed)/([a-zA-Z0-9_-]+)",
+        "https?://(?:[^\\.]+\\.)?(?:youtu\\.be|" +
+        "youtube\\.com/embed)/([a-zA-Z0-9_-]+)",
         "http://noembed.com/embed",
     ],
     [
@@ -18,7 +19,8 @@ NOEMBED_PROVIDER_LIST = [
     ["http://bash\\.org/\\?(\\d+)", "http://noembed.com/embed"],
     ["http://amzn\\.com/([^/]+)", "http://noembed.com/embed"],
     [
-        "http://www\\.amazon\\.com/(?:.+/)?[gd]p/(?:product/)?(?:tags-on-product/)?([a-zA-Z0-9]+)",
+        "http://www\\.amazon\\.com/(?:.+/)?[gd]p/(?:product/)" +
+        "?(?:tags-on-product/)?([a-zA-Z0-9]+)",
         "http://noembed.com/embed",
     ],
     ["https://tube.switch.ch/videos/([a-z0-9]+)", "http://noembed.com/embed"],
@@ -27,11 +29,16 @@ NOEMBED_PROVIDER_LIST = [
         "https?://www\\.(dropbox\\.com/s/.+\\.(?:jpg|png|gif))",
         "http://noembed.com/embed",
     ],
-    ["https?://imgur\\.com/(?:[^\\/]+/)?[0-9a-zA-Z]+$", "http://noembed.com/embed"],
+    ["https?://imgur\\.com/(?:[^\\/]+/)?[0-9a-zA-Z]+$",
+     "http://noembed.com/embed"],
     ["https?://muki\\.io/(embed/)?(.+)", "http://noembed.com/embed"],
     ["https?://vine.co/v/[a-zA-Z0-9]+", "http://noembed.com/embed"],
     [
-        "https?://reports\\.zoho\\.com/ZDBDataSheetView\\.cc\\?OBJID=1432535000000003002&STANDALONE=true&INTERVAL=120&DATATYPESYMBOL=false&REMTOOLBAR=false&SEARCHBOX=true&INCLUDETITLE=true&INCLUDEDESC=true&SHOWHIDEOPT=true",
+        "https?://reports\\.zoho\\.com/ZDBDataSheetView\\.cc\\?" +
+        "OBJID=1432535000000003002&" +
+        "STANDALONE=true&INTERVAL=120&DATATYPESYMBOL=" +
+        "false&REMTOOLBAR=false&SEARCHBOX=true&INCLUDETITLE=" +
+        "true&INCLUDEDESC=true&SHOWHIDEOPT=true",
         "http://noembed.com/embed",
     ],
     ["https?://yfrog\\.us/.*", "http://noembed.com/embed"],
