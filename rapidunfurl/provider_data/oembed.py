@@ -67,7 +67,9 @@ OEMBED_PROVIDER_LIST = [
         "https://www.youtube.com/oembed",
     ],
     [
-        "https://reports.zoho.com/ZDBDataSheetView.cc\\?OBJID=1432535000000003002&STANDALONE=true&INTERVAL=120&DATATYPESYMBOL=false&REMTOOLBAR=false&SEARCHBOX=true&INCLUDETITLE=true&INCLUDEDESC=true&SHOWHIDEOPT=true",
+        "https://reports.zoho.com/ZDBDataSheetView.cc\\?OBJID=1432535000000003002" +
+        "&STANDALONE=true&INTERVAL=120&DATATYPESYMBOL=false&REMTOOLBAR=false" +
+        "&SEARCHBOX=true&INCLUDETITLE=true&INCLUDEDESC=true&SHOWHIDEOPT=true",
         "http://api.provider.com/oembed.json",
     ],
     [
@@ -386,7 +388,8 @@ OEMBED_PROVIDER_LIST = [
         "http://api.smugmug.com/services/oembed/",
     ],
     [
-        "https://smashnotes.com/p/[^\\/\\s\\?&]+?/e/[^\\/\\s\\?&]+? - https://smashnotes.com/p/[^\\/\\s\\?&]+?/e/[^\\/\\s\\?&]+?/s/[^\\/\\s\\?&]+?",
+        "https://smashnotes.com/p/[^\\/\\s\\?&]+?/e/[^\\/\\s\\?&]+? - " +
+        "https://smashnotes.com/p/[^\\/\\s\\?&]+?/e/[^\\/\\s\\?&]+?/s/[^\\/\\s\\?&]+?",
         "https://smashnotes.com/services/oembed",
     ],
     [

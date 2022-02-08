@@ -6,7 +6,8 @@
 
 # To upload this file to PyPI you must build it then upload it:
 # python setup.py sdist bdist_wheel  # build in 'dist' folder
-# python-m twine upload dist/*  # 'twine' must be installed: 'pip install twine'
+# python-m twine upload dist/*
+# 'twine' must be installed: 'pip install twine'
 
 
 import io
@@ -23,10 +24,10 @@ with io.open(os.path.join(CURDIR, "README.md"), "r", encoding="utf-8") as f:
 
 setup(
     name="rapidunfurl",
-    version='0.1.0',
+    version='0.1.1',
     author="Davin Taddeo",
     author_email="davin@davintaddeo.com",
-    description="library designed to pull and process metadata very quickly to unfurl URL contents into a JSON object that can the be used by other programs",
+    description="Quickly extract metadata from URLs",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/tdarwin/rapidunfurl",

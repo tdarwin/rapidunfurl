@@ -1,1 +1,1 @@
-from rapidunfurl.unfurl import unfurl
+from rapidunfurl.unfurl import unfurl # noqa
