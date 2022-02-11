@@ -9,7 +9,7 @@ from .provider_data.noembed import NOEMBED_PROVIDER_LIST
 from .provider_data.custom import CUSTOM_PROVIDER_LIST
 from .provider_data.oembed import OEMBED_PROVIDER_LIST
 
-__version__ = "0.0.2"
+__version__ = "1.0.0"
 import micawber
 import requests
 from pyquery import PyQuery as pq
@@ -206,11 +206,17 @@ def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
     the list that is included with pyunfurl is used
     :return: dict
     """
-    data = {}
+    data = {
+        "url": url
+    }
 
     r = get(url, timeout=timeout)
 
-    if not r or not r.ok:
+    if r is None:
+        data = extend_dict(data, {"response": "unreachable"})
+        return data
+    elif not r.ok:
+        data = extend_dict(data, {"response": str(r.status_code)})
         return data
 
     r_pq = pq(r.text)
@@ -229,5 +235,6 @@ def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
     data = meta_tags(r_head, favicon)
     data = extend_dict(data, twitter_card(r_head))
     data = extend_dict(data, open_graph(r_head))
+    data = extend_dict(data, {"url": url})
     clean_data = cleanNullTerms(data)
     return wrap_response(url, clean_data)
