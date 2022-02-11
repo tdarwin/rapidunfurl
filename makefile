@@ -1,12 +1,13 @@
 .PHONY: clean build publish
 
 build: clean
-	python -m pip install --upgrade --quiet setuptools wheel twine
-	python setup.py --quiet sdist bdist_wheel
+	python3 -m pip install --upgrade --quiet build twine
+	python3 -m build
 
 publish: build
-	python -m twine check dist/*
-	python -m twine upload dist/*
+	python3 -m twine check dist/*
+	python3 -m twine upload dist/*
 
 clean:
-	rm -r build dist *.egg-info || true
+	rm -r dist *.egg-info || true
+	find rapidunfurl/ -type d -name '__pycache__' -exec rm -rf {} \;

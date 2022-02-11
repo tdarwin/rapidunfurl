@@ -24,13 +24,16 @@ with io.open(os.path.join(CURDIR, "README.md"), "r", encoding="utf-8") as f:
 
 setup(
     name="rapidunfurl",
-    version='0.1.1',
+    version='1.0.0',
     author="Davin Taddeo",
     author_email="davin@davintaddeo.com",
     description="Quickly extract metadata from URLs",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/tdarwin/rapidunfurl",
+    project_urls={
+        "Bug Tracker": "https://github.com/tdarwin/rapidunfurl/issues"
+    },
     packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
     include_package_data=True,
     install_requires=DEPENDENCIES,

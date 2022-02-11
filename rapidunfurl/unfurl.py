@@ -9,14 +9,14 @@ from .provider_data.noembed import NOEMBED_PROVIDER_LIST
 from .provider_data.custom import CUSTOM_PROVIDER_LIST
 from .provider_data.oembed import OEMBED_PROVIDER_LIST
 
-__version__ = "0.0.2"
+__version__ = "1.0.0"
 import micawber
 import requests
 from pyquery import PyQuery as pq
 from uritools import urijoin
 
 
-def get(url, timeout=5):
+async def get(url, timeout=5):
     try:
         x = None
         x = requests.get(url,
@@ -195,7 +195,7 @@ def cleanNullTerms(data):
 
 
 @functools.lru_cache(maxsize=64)
-def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
+async def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
     """
     :param url: The url to embed
     :param timeout: Timeout (in seconds) to allow url to load
@@ -206,11 +206,17 @@ def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
     the list that is included with pyunfurl is used
     :return: dict
     """
-    data = {}
+    data = {
+        "url": url
+    }
 
-    r = get(url, timeout=timeout)
+    r = await get(url, timeout=timeout)
 
-    if not r or not r.ok:
+    if r is None:
+        data = extend_dict(data, {"response": "unreachable"})
+        return data
+    elif not r.ok:
+        data = extend_dict(data, {"response": str(r.status_code)})
         return data
 
     r_pq = pq(r.text)
