@@ -210,7 +210,7 @@ async def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
         "url": url
     }
 
-    r = await get(url, timeout=timeout)
+    r = get(url, timeout=timeout)
 
     if r is None:
         data = extend_dict(data, {"response": "unreachable"})
