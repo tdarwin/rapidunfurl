@@ -6,7 +6,6 @@ What changes have been made with different releases
 
 - Changed how data was returned for unreachable URLs and for URLs with non-200 responses
 - Ensured that the URL returned in the data is always the URL that was sent originally
-- Set method definition of unfurl to by `async` so it can be better used by asyncio systems.
 - Updated the makefile so that the clean operation cleans out the `__pycache__` directory
 - Added a CHANGELOG.md
 

@@ -16,7 +16,7 @@ from pyquery import PyQuery as pq
 from uritools import urijoin
 
 
-async def get(url, timeout=5):
+def get(url, timeout=5):
     try:
         x = None
         x = requests.get(url,
@@ -235,5 +235,6 @@ async def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
     data = meta_tags(r_head, favicon)
     data = extend_dict(data, twitter_card(r_head))
     data = extend_dict(data, open_graph(r_head))
+    data = extend_dict(data, {"url": url})
     clean_data = cleanNullTerms(data)
     return wrap_response(url, clean_data)
