@@ -195,7 +195,7 @@ def cleanNullTerms(data):
 
 
 @functools.lru_cache(maxsize=64)
-async def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
+def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
     """
     :param url: The url to embed
     :param timeout: Timeout (in seconds) to allow url to load
