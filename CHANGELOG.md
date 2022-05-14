@@ -2,6 +2,11 @@
 
 What changes have been made with different releases
 
+## 1.1.0
+
+- Changed timeouts on requests so that they timeout faster and return something, rather than just hanging and holding onto threads
+- Updated error handling significantly on requests and pyquery operations
+
 ## 1.0.0
 
 - Changed how data was returned for unreachable URLs and for URLs with non-200 responses
