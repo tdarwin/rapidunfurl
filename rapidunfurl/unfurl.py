@@ -9,21 +9,39 @@ from .provider_data.noembed import NOEMBED_PROVIDER_LIST
 from .provider_data.custom import CUSTOM_PROVIDER_LIST
 from .provider_data.oembed import OEMBED_PROVIDER_LIST
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 import micawber
 import requests
 from pyquery import PyQuery as pq
 from uritools import urijoin
 
 
-def get(url, timeout=5):
+def get(url, connect=2, read=2):
     try:
         x = None
-        x = requests.get(url,
-                         timeout=timeout,
-                         headers={'User-Agent': 'RapidUnfurl/01.0'})
-    except requests.exceptions.RequestException:
-        x = None
+        x = requests.get(url, timeout=(connect, read), headers={'User-Agent': 'RapidUnfurl/1.1'})
+    except requests.exceptions.ConnectTimeout as e:
+        ex = "{ \"exception\": " + str(e) + " }"
+        x = requests.models.Response()
+        x.code = "exception"
+        x.error_type = e
+        x.status_code = 408
+        x._content = ex.encode()
+    except requests.exceptions.ReadTimeout as e:
+        ex = "{ \"exception\": " + str(e) + " }"
+        x = requests.models.Response()
+        x.code = "exception"
+        x.error_type = e
+        x.status_code = 408
+        x._content = ex.encode()
+    except Exception as e:
+        ex = "{ \"exception\": " + str(e) + " }"
+        x = requests.models.Response()
+        x.code = "exception"
+        x.error_type = e
+        x.status_code = 418
+        x._content = ex.encode()
+
     return x
 
 
@@ -157,14 +175,14 @@ def extend_dict(d1, d2):
     return result
 
 
-def custom_unfurl(url, timeout=5):
+def custom_unfurl(url, connect=2, read=3):
     for regex, provider in CUSTOM_PROVIDER_LIST:
         if re.match(regex, url):
-            return provider(url, timeout)
+            return provider(url, timeout=(connect, read))
     return None
 
 
-def get_favicon(html, url, timeout=5):
+def get_favicon(html, url, connect=1, read=1):
 
     d = pq(html)
     favicon = d('link[rel="icon"]').attr("href")
@@ -174,11 +192,23 @@ def get_favicon(html, url, timeout=5):
         favicon = d('link[rel="shortcut icon"]').attr("href")
     if not favicon:
         favicon_url = urijoin(url, "/favicon.ico")
-        r = requests.head(favicon_url)
+        r = get(favicon_url, connect=connect, read=read)
         if r.status_code == 200:
             favicon = favicon_url
+        else:
+            favicon = None
 
     return favicon
+
+
+def cleanBadTags(data):
+    clean = {}
+    keys = ["html"]
+    for k, _v in data.items():
+        v = data.get(k)
+        if str(k) not in keys:
+            clean[k] = v
+    return clean
 
 
 def cleanNullTerms(data):
@@ -195,10 +225,11 @@ def cleanNullTerms(data):
 
 
 @functools.lru_cache(maxsize=64)
-def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
+def unfurl(url, connect_timeout=2, read_timeout=2, refresh_oembed_provider_list=False):
     """
     :param url: The url to embed
-    :param timeout: Timeout (in seconds) to allow url to load
+    :param connect_timeout: Timeout (in seconds) to connect to the URL
+    :param read_timeout: Timeout (in seconds) to receive a response from the URL
     :param html: If you already have the html available you
                     can pass it in to save a network call
     :param refresh_oembed_provider_list: Set to True to
@@ -210,31 +241,40 @@ def unfurl(url, timeout=5, refresh_oembed_provider_list=False):
         "url": url
     }
 
-    r = get(url, timeout=timeout)
+    r = get(url, connect=connect_timeout, read=read_timeout)
 
-    if r is None:
-        data = extend_dict(data, {"response": "unreachable"})
-        return data
-    elif not r.ok:
-        data = extend_dict(data, {"response": str(r.status_code)})
+    if not r.ok:
+        data = extend_dict(data, {"status_code": str(r.status_code), "exception": str(r.error_type)})
         return data
 
-    r_pq = pq(r.text)
+    try:
+        r_pq = pq(r.text)
+    except Exception:
+        r_pq = pq("<html><head></head></html>")
+
     r_head = r_pq('head')
 
     favicon = get_favicon(r_head, url)
 
-    data = custom_unfurl(url, timeout)
+    data = custom_unfurl(url, connect=connect_timeout, read=read_timeout)
     if data:
-        return wrap_response(url, data)
+        data = extend_dict(data, {"status_code": str(r.status_code)})
+        clean_tags = cleanBadTags(data)
+        clean_data = cleanNullTerms(clean_tags)
+        return wrap_response(url, clean_data)
 
     data = oembed(r_head, url, refresh_oembed_provider_list)
     if data:
-        return wrap_response(url, data)
+        data = extend_dict(data, {"status_code": str(r.status_code)})
+        clean_tags = cleanBadTags(data)
+        clean_data = cleanNullTerms(clean_tags)
+        return wrap_response(url, clean_data)
 
     data = meta_tags(r_head, favicon)
     data = extend_dict(data, twitter_card(r_head))
     data = extend_dict(data, open_graph(r_head))
+    data = extend_dict(data, {"status_code": str(r.status_code)})
     data = extend_dict(data, {"url": url})
-    clean_data = cleanNullTerms(data)
+    clean_tags = cleanBadTags(data)
+    clean_data = cleanNullTerms(clean_tags)
     return wrap_response(url, clean_data)

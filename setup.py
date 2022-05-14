@@ -24,7 +24,7 @@ with io.open(os.path.join(CURDIR, "README.md"), "r", encoding="utf-8") as f:
 
 setup(
     name="rapidunfurl",
-    version='1.0.0',
+    version='1.1.0',
     author="Davin Taddeo",
     author_email="davin@davintaddeo.com",
     description="Quickly extract metadata from URLs",
