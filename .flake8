@@ -1,0 +1,3 @@
+[flake8]
+max-line-length = 500
+per-file-ignores = test.py:F401
