@@ -21,7 +21,6 @@ class UnitTests(unittest.TestCase):
         self.assertEqual(
             "SpaceX’s Falcon Heavy successfully launches",
             custom["title"], "custom:title")
-        self.assertEqual("", custom["description"], "custom:description")
 
         custom = rapidunfurl.unfurl(
             "https://news.ycombinator.com/item?id=16319522")
